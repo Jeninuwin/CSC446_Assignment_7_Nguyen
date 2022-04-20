@@ -441,6 +441,7 @@ namespace CSC446_Assignment_7_Nguyen
             }
         }
 
+
         /// <summary>
         /// The ParamTail will see if the MatchTokens fit either int, float, char, or rparent
         /// </summary>
@@ -541,6 +542,7 @@ namespace CSC446_Assignment_7_Nguyen
                         increments++;
                         Decl();
                         StatList();
+                        Ret_Stat();
 
                         if (Lexie.MatchTokens[increments] == "closeCurlyParent")
                         {
@@ -986,7 +988,17 @@ namespace CSC446_Assignment_7_Nguyen
                                 case "assignopt":
                                     {
                                         increments++;
-                                        Expr();
+
+                                        if (Lexie.MatchTokens[increments] == "lparent")
+                                        {
+                                            increments--;
+                                            FuncCall();
+                                        }
+                                        else
+                                        {
+                                            increments--;
+                                            Expr();
+                                        }
                                         break;
                                     }
                                 default:
@@ -1009,6 +1021,60 @@ namespace CSC446_Assignment_7_Nguyen
             }
         }
 
+        public static void FuncCall()
+        {
+            switch (Lexie.MatchTokens[increments])
+            {
+                case "idt":
+                    {
+                        increments++;
+                        switch (Lexie.MatchTokens[increments])
+                        {
+                            case "rparent":
+                                {
+                                    Params();
+                                    if(Lexie.MatchTokens[increments] == "lparent")
+                                    {
+                                        increments++;
+                                    }
+                                    break;
+                                }
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        Console.WriteLine("Error: " + Lexie.MatchTokens[increments] + " was found when searching for 'idt'. Not correct Grammar.");
+                        Environment.Exit(1);
+                        break;
+                    }
+            }
+        }
+
+        public static void Params()
+        {
+            switch (Lexie.MatchTokens[increments])
+            {
+                case "idt":
+                    {
+                        ParamsTail();
+                        break;
+                    }
+                case "numt":
+                    {
+                        ParamsTail();
+                        break;
+                    }
+                case "eofft":
+                    {
+                        break;
+                    }
+                default:
+                    {
+                        break;
+                    }
+            }
+        }
         /// <summary>
         /// IOStat -> 
         /// </summary>
@@ -1078,6 +1144,64 @@ namespace CSC446_Assignment_7_Nguyen
             }
         }
 
+        public static void ParamsTail()
+        {
+            switch (Lexie.MatchTokens[increments])
+            {
+                case "commat":
+                    {
+                        increments++;
+
+                        switch (Lexie.MatchTokens[increments]) //this will see if the MatchTokens will match "idt" if it does call Rest, else error
+                        {
+                            case "idt":
+                            case "numt":
+                                {
+                                    increments++;
+                                    ParamTail();
+                                    break;
+                                }
+                            case "rparent":
+                                {
+                                    increments++;
+                                    break;
+                                }
+                            default:
+                                {
+                                    Console.WriteLine("Error: " + Lexie.MatchTokens[increments] + " was found when searching for 'idt'. Not correct Grammar.");
+                                    Environment.Exit(1);
+                                    break;
+                                }
+                        }
+                    }
+                    break;
+                case "rparent":
+                    break;
+            default:
+                    {
+                Console.WriteLine("Error: " + Lexie.MatchTokens[increments] + " was found when searching for 'rparent'. Not correct Grammar."); Environment.Exit(1);
+                Environment.Exit(1);
+                break;
+            }
+
+        }
+          
+        }
+        public static void Ret_Stat()
+        {
+            switch (Lexie.MatchTokens[increments])
+            {
+                case "returnt":
+                    {
+                        Expr();
+                        if (Lexie.MatchTokens[increments] == "semit")
+                        {
+                            break;
+                        }
+                        break;
+                    }
+            }
+        }
         /// <summary>
         /// Term -> Factor MoreFactor
         /// </summary>

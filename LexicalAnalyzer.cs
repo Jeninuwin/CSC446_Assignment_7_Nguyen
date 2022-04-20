@@ -40,6 +40,7 @@ namespace CSC446_Assignment_7_Nguyen
             literalt, relopt, assignopt, addopt, mulopt, idt, integert, nott, whitespace, semit, quotet, colont, commat, closeParent,
             openParent, periodt, openCurlyParent, closeCurlyParent, openSquareParent, closeSquareParent, numt, constt,
             signopt,
+            returnt,
         }
 
         /// <summary>
@@ -299,6 +300,12 @@ namespace CSC446_Assignment_7_Nguyen
                     Token = Symbols.constt;
                     counting++;
 
+                    break;
+                case "return":
+                    LexemeString.Add(Lexeme);
+                    MatchTokens.Add("returnt");
+                    Token = Symbols.returnt;
+                    counting++;
                     break;
                 default:
                     LexemeString.Add(Lexeme);
