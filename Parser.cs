@@ -1196,6 +1196,7 @@ namespace CSC446_Assignment_7_Nguyen
                         Expr();
                         if (Lexie.MatchTokens[increments] == "semit")
                         {
+                            increments++;
                             break;
                         }
                         break;
