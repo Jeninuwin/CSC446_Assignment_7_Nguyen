@@ -21,6 +21,7 @@ namespace CSC446_Assignment_7_Nguyen
         /// </summary>
         public static string nameFile;
 
+        public static string tempFileName; 
         /// <summary>
         /// Defines the ch.
         /// </summary>
@@ -97,14 +98,14 @@ namespace CSC446_Assignment_7_Nguyen
                 do
                 {
                     Console.WriteLine("Enter your c file name: ");
-                    nameFile = Console.ReadLine();
-                } while (string.IsNullOrWhiteSpace(nameFile));
+                    tempFileName = Console.ReadLine();
+                } while (string.IsNullOrWhiteSpace(tempFileName));
             }
 
             if (args.Length > 0 && File.Exists(file_dir + args[0]))
                 nameFile = file_dir + args[0];
-            else if (File.Exists(file_dir + nameFile))
-                nameFile = file_dir + nameFile;
+            else if (File.Exists(file_dir + tempFileName))
+                nameFile = file_dir + tempFileName;
             else
             {
                 Console.WriteLine("ERROR: File not found.");

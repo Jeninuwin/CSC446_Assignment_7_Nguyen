@@ -28,6 +28,7 @@ namespace CSC446_Assignment_7_Nguyen
             public int depth;
             public string Token;
             public string lexeme;
+            public string Offset;
             public RecordEnum typeOfEntry;
         }
 
@@ -122,7 +123,6 @@ namespace CSC446_Assignment_7_Nguyen
 
             //no error checking performed
 
-            EntryVar.depth = depth;
             //add to front of list
             symboltable[x].Insert(0, EntryVar);
 
@@ -172,6 +172,7 @@ namespace CSC446_Assignment_7_Nguyen
         public static void writeTable(int depth)
         {
             string pad = " ";
+
             Console.WriteLine("Lexeme" + pad.PadRight(12) + "Token" + pad.PadRight(12) + "Depth" + pad.PadRight(12) + "Type");
             Console.WriteLine("_______________________________________________________________");
 
