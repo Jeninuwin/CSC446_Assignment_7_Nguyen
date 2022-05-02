@@ -33,6 +33,7 @@ namespace CSC446_Assignment_7_Nguyen
         public static StreamWriter writerfile;
         public static string returnString = "_AX";
         public static string mulopTemp = "";
+        public static string firstvar = "";
         public static string addopTemp = "";
         public static string tempFile = Lexie.tempFileName;
         public static SymbolTable.entryTable val = new SymbolTable.entryTable();
@@ -1029,6 +1030,7 @@ namespace CSC446_Assignment_7_Nguyen
                             {
                                 case "assignopt":
                                     {
+                                        firstvar = Lexie.LexemeString[increments-1];
                                         tempinfo += Lexie.LexemeString[increments];
                                         addopTemp += Lexie.LexemeString[increments];
 
@@ -1073,9 +1075,8 @@ namespace CSC446_Assignment_7_Nguyen
             {
                 case "idt":
                     {
-                        writerfile.WriteLine();
-                        writerfile.WriteLine("Call " + Lexie.LexemeString[increments]);
                         increments++;
+                        string functionName = Lexie.LexemeString[increments-1];
                         switch (Lexie.MatchTokens[increments])
                         {
                             case "lparent":
@@ -1084,6 +1085,8 @@ namespace CSC446_Assignment_7_Nguyen
                                     writerfile.WriteLine("Push " + Lexie.LexemeString[increments]);
                                     Params();
                                     writerfile.WriteLine("Push " + Lexie.LexemeString[increments - 1]);
+                                    writerfile.WriteLine();
+                                    writerfile.WriteLine("Call " + functionName);
                                     if (Lexie.MatchTokens[increments] == "rparent")
                                     {
                                         increments++;
@@ -1283,13 +1286,11 @@ namespace CSC446_Assignment_7_Nguyen
                         }
                         else
                         {
-                            writerfile.WriteLine(varString + (varCounter) + tempinfo);
-                            writerfile.WriteLine(Lexie.LexemeString[increments - (tempinfo.Length + 1)] + "=" + varString + varCounter);
+                            //writerfile.WriteLine(varString + (varCounter) + tempinfo);
+                            //writerfile.WriteLine(firstvar + "=" + varString + varCounter);
                             //writerfile.WriteLine(Lexie.LexemeString[increments - (tempinfo.Length + 1)] + "=" + mulopTemp);
 
                         }
-
-                        writerfile.WriteLine();
                         tempinfo = "";
                         mulopTemp = "";
                         addopTemp = "";
@@ -1309,23 +1310,48 @@ namespace CSC446_Assignment_7_Nguyen
                             {
                                 addopTemp = "";
                                 addopTemp += tempinfo;
+                                varCounter+=2;
                                 prevBP = varString + varCounter;
 
                                 increments--;
                                 string[] temptest = addopTemp.Split("+");
 
                                 temptest[0] = temptest[0].Replace("=", "");
-                                temptest[1] = prevBP;
-                                addopTemp = "="+ temptest[1] + "-" +temptest[0];
-                                // addopTemp = String.Concat(temptest);
-                                //increment to bp_6
-                                varCounter += 2;
-                                writerfile.WriteLine(varString + (varCounter) + addopTemp);
+
+                                if(temptest.Length == 2)
+                                {
+                                    writerfile.WriteLine(prevBP + "=" + temptest[1]);
+                                }
+                                else if(temptest.Length == 1)
+                                {
+                                    writerfile.WriteLine(prevBP + "=" + temptest[0]);
+                                }
+                                else
+                                {
+                                    break;
+                                }
                                 writerfile.WriteLine();
+
+                                if (temptest.Length == 2)
+                                {
+                                    temptest[1] = prevBP;
+                                    addopTemp = "=" + temptest[1] + "+" + temptest[0];
+                                }
+                                else if (temptest.Length == 1)
+                                {
+                                    increments++;
+                                   break;
+                                }
+
+                                varCounter += 2;
+                                //writerfile.WriteLine(varString + (varCounter) + addopTemp);
+                                //writerfile.WriteLine(firstvar + "=" + varString + varCounter);
+                                //writerfile.WriteLine();
                                 prevBP = varString + varCounter;
                                 tempinfo = temptest[0] + "+" + prevBP;
-                                varCounter -= 2;
 
+                                writerfile.WriteLine(varString + (varCounter) + "=" + addopTemp);
+                                writerfile.WriteLine(firstvar + "=" + varString + varCounter);
 
                             }
                         }
@@ -1373,6 +1399,115 @@ namespace CSC446_Assignment_7_Nguyen
                             {
                                 tempinfo += Lexie.LexemeString[increments];
                                 addopTemp += Lexie.LexemeString[increments];
+                                int position = tempinfo.IndexOf(prevBP);
+
+                                if (tempinfo.Length>8 &&  position == 4 )
+                                {
+                                    string[] temptemps = tempinfo.Split("+");
+                                    addopTemp = "";
+
+                                    varCounter += 2;
+                                    writerfile.WriteLine(varString + (varCounter) + "=" + temptemps[2]);
+                                    varCounter -= 4;
+                                    temptemps[1] = varString + varCounter;
+                                    tempinfo = temptemps[0] + "+" + temptemps[1];
+
+                                    varCounter += 2;
+                                    
+                                    writerfile.WriteLine(varString + (varCounter) + tempinfo);
+                                    writerfile.WriteLine();
+
+                                    int currentcount = varCounter;
+                                    varCounter += 2;
+                                    prevBP = varString + varCounter;
+                                    if(temptemps.Length > 2)
+                                    {
+                                        temptemps[2] = prevBP;
+                                    }
+                                    addopTemp = varString + currentcount+ "+" + temptemps[2];
+                                    varCounter += 4;
+
+                                    writerfile.WriteLine(varString + (varCounter) + "=" + addopTemp);
+                                    writerfile.WriteLine(firstvar + "=" + varString + varCounter);
+                                    writerfile.WriteLine();
+                                    addopTemp = "";
+                                    tempinfo = "";
+                                }
+                                else if(tempinfo.Contains("*") && position == 0)
+                                {
+                                    writerfile.WriteLine();
+                                    string[] temptemps = tempinfo.Split("*");
+                                    addopTemp = "";
+                                    string currentadd;
+                                    int currentcounter = 0; 
+                                    if (temptemps.Length == 2)
+                                    {
+                                         currentadd = temptemps[1];
+                                        varCounter += 2;
+
+                                        currentcounter = varCounter;
+
+                                        writerfile.WriteLine(varString + currentcounter + "=" + currentadd);
+                                        writerfile.WriteLine();
+                                    }
+                                    else if (temptemps.Length == 3)
+                                    {
+                                        currentadd = temptemps[2];
+                                        varCounter += 2;
+
+                                        currentcounter = varCounter;
+
+                                        writerfile.WriteLine(varString + currentcounter + "=" + currentadd);
+                                        writerfile.WriteLine();
+                                    }
+                                    //string currentadd = temptemps[1];
+                                    //int currentcounter;
+                                    //varCounter += 2;
+
+                                    //currentcounter = varCounter;
+
+                                    //writerfile.WriteLine(varString + currentcounter + "=" + currentadd);
+                                    //writerfile.WriteLine();
+
+                                    //varCounter += 2;
+                                    //temptemps[1] = varString + varCounter;
+                                    addopTemp = varString + currentcounter;
+
+                                    if(temptemps.Length == 2)
+                                    {
+                                        tempinfo = temptemps[0] + "*" + addopTemp;
+                                    }
+                                    else if(temptemps.Length == 3)
+                                    {
+                                        increments++;
+                                        tempinfo = temptemps[1] + "*" + addopTemp;
+                                        break;
+                                    }
+
+                                    varCounter += 2;
+                                    writerfile.WriteLine(varString + (varCounter) + "=" + tempinfo);
+
+                                    if (Lexie.LexemeString[increments] == ";" || Lexie.LexemeString[increments+1] == ";")
+                                    {
+                                        writerfile.WriteLine(firstvar + "=" + varString + varCounter);
+                                        writerfile.WriteLine();
+                                    }
+                                    writerfile.WriteLine();
+
+                                    tempinfo = "=" + temptemps[1] + tempinfo;
+                                    writerfile.WriteLine(varString + (varCounter) + "=" + tempinfo);
+                                    writerfile.WriteLine();
+                                }
+                                else if(tempinfo.Length >=3 && Lexie.LexemeString[increments+1] == ";")
+                                {
+                                    writerfile.WriteLine(varString + (varCounter) + tempinfo);
+                                    writerfile.WriteLine(firstvar + "=" + varString + varCounter);
+                                }
+                                else if(tempinfo.Contains("-") && increments == 43)
+                                {
+                                    writerfile.WriteLine(varString + (varCounter) + tempinfo);
+                                    writerfile.WriteLine(firstvar + "=" + varString + varCounter);
+                                }
 
                             }
                             increments++;
@@ -1390,6 +1525,11 @@ namespace CSC446_Assignment_7_Nguyen
                         else
                         {
                             tempinfo += Lexie.LexemeString[increments];
+                            if (Lexie.LexemeString[increments+1] == ";")
+                            {
+                                writerfile.WriteLine(varString + (varCounter) + tempinfo);
+                                writerfile.WriteLine(firstvar + "=" + varString + varCounter);
+                            }
 
                         }
 
@@ -1478,23 +1618,64 @@ namespace CSC446_Assignment_7_Nguyen
                                 //{
                                 //    addopTemp = addopTemp.TrimEnd() + prevBP;
                                 //}
-                                increments--;
-                                mulopTemp += Lexie.LexemeString[increments];
-                                increments++;
-                                mulopTemp += Lexie.LexemeString[increments];
-                                increments++;
-                                mulopTemp += Lexie.LexemeString[increments];
-                                increments++;
+                                if(tempinfo.Length == 4 && tempinfo.Contains("+") && (Lexie.LexemeString[increments+1] == ";" || Lexie.LexemeString[increments + 2] == ";"))
+                                {
+                                    writerfile.WriteLine(varString + (varCounter) + tempinfo);
+                                    tempinfo = varString + varCounter;
+                                    writerfile.WriteLine(firstvar + "=" + tempinfo);
+                                    writerfile.WriteLine();
+                                    mulopTemp += Lexie.LexemeString[increments];
+                                    tempinfo += mulopTemp;
+                                    increments++;
+
+                                    break;
+                                }
+                                else if(tempinfo.Length == 4 && tempinfo.Contains("+"))
+                                {
+                                    writerfile.WriteLine(varString + (varCounter) + tempinfo);
+                                    tempinfo = "*" + varString + varCounter;
+                                    writerfile.WriteLine();
+                                    mulopTemp += Lexie.LexemeString[increments];
+                                    tempinfo += mulopTemp;
+                                    increments++;
+                                    break;
+                                }
+                                else
+                                {
+                                    increments--;
+                                    mulopTemp += Lexie.LexemeString[increments];
+                                    increments++;
+                                    mulopTemp += Lexie.LexemeString[increments];
+                                    increments++;
+                                    mulopTemp += Lexie.LexemeString[increments];
+                                    increments++;
+                                }
+
                             }
                             else if(Lexie.LexemeString[increments] == "/")
                             {
-                                increments--;
-                                mulopTemp += Lexie.LexemeString[increments];
-                                increments++;
-                                mulopTemp += Lexie.LexemeString[increments];
-                                increments++;
-                                mulopTemp += Lexie.LexemeString[increments];
-                                increments++;
+                                if (tempinfo.Length == 4 && tempinfo.Contains("+") && Lexie.LexemeString[increments + 1] == ";")
+                                {
+                                    writerfile.WriteLine(varString + (varCounter) + tempinfo);
+                                    tempinfo = varString + varCounter;
+                                    writerfile.WriteLine(firstvar + "=" + tempinfo);
+                                    writerfile.WriteLine();
+                                    mulopTemp += Lexie.LexemeString[increments];
+                                    tempinfo += mulopTemp;
+                                    increments++;
+
+                                    break;
+                                }
+                                else
+                                {
+                                    increments--;
+                                    mulopTemp += Lexie.LexemeString[increments];
+                                    increments++;
+                                    mulopTemp += Lexie.LexemeString[increments];
+                                    increments++;
+                                    mulopTemp += Lexie.LexemeString[increments];
+                                    increments++;
+                                }
                             }
                             else
                             {
@@ -1507,6 +1688,12 @@ namespace CSC446_Assignment_7_Nguyen
                             prevBP = varString + previousCounter;
                             tempinfo = tempinfo + prevBP;
                             varCounter += 2;
+                            if(Lexie.LexemeString[increments+1] == ";")
+                            {
+                                writerfile.WriteLine(varString + (varCounter) + tempinfo);
+                                writerfile.WriteLine(firstvar + "=" + varString + varCounter);
+                            }
+
                             // increments++;
                         }
                         else
